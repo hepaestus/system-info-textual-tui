@@ -11,16 +11,16 @@ fi
 
 # Tmux script to create a split pane session with btop and GPU network TUI
 # Left pane: btop (system monitor)
-# Right pane: gpu-net-tui.py (GPU and network monitor)
+# Right pane: system-info-textual-tui.py (GPU, network, Docker monitor)
 
 # Start a new tmux session named "system-monitor"
 tmux new-session -d -s "gpu/network/docker system-monitor" \; \
   send-keys 'btop' Enter \; \
   split-window -h \; \
-  send-keys 'python3 ./gpu-textual-tui.py' Enter \; \
+  send-keys 'python3 ./system-info-textual-tui.py' Enter \; \
   select-pane -t 0 \; \
   attach-session
 
 # Alternative one-liner version (uncomment to use instead):
-# tmux new-session -d -s "system-monitor" 'btop' \; split-window -h 'cd /home/petegit/gpu-textual-tui && python3 gui-textual-tui.py' \; attach-session
+# tmux new-session -d -s "system-monitor" 'btop' \; split-window -h 'python3 system-info-textual-tui.py' \; attach-session
 
