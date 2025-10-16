@@ -1,8 +1,8 @@
 
 import textual
 from textual.app import App, ComposeResult
-from textual.containers import Container, Horizontal
-from textual.widgets import Static, Button, Header, Footer, Log
+from textual.containers import Container, Horizontal, Vertical
+from textual.widgets import Static, Button, Header, Footer, Log, DataTable
 from textual.reactive import reactive
 from textual import events
 import subprocess
@@ -143,6 +143,57 @@ class Colors:
     DOWNLOAD_ARROW = "↓"       # Download traffic
     UPLOAD_ARROW = "↑"         # Upload traffic
 
+class GPUProcessTable(DataTable):
+    """DataTable widget for displaying GPU processes"""
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.border_title = f"{Symbols.GPU_ICON} GPU Processes"
+        self.zebra_stripes = True
+        self.cursor_type = "row"
+        self.show_header = True
+        
+    def on_mount(self):
+        # Add columns
+        self.add_column("PID", width=8)
+        self.add_column("Process Name", width=30)
+        self.add_column("Memory", width=12)
+    
+    def update_processes(self, processes):
+        """Update the table with new process data"""
+        # Clear existing rows
+        self.clear()
+        
+        if not processes:
+            self.add_row("No processes", "running on GPU", "-")
+            return
+            
+        # Sort processes by memory usage (descending)
+        sorted_processes = sorted(processes, 
+                                key=lambda x: self._extract_memory_mb(x.get('Memory', '0 MB')), 
+                                reverse=True)
+        
+        for proc in sorted_processes:
+            pid = proc.get('PID', 'N/A')
+            name = proc.get('Name', 'Unknown Process')
+            memory = proc.get('Memory', 'N/A MB')
+            
+            # Truncate long process names (increased width since we removed Type column)
+            if len(name) > 27:
+                name = name[:24] + "..."
+                
+            self.add_row(pid, name, memory)
+    
+    def _extract_memory_mb(self, memory_str):
+        """Extract memory value in MB for sorting purposes"""
+        try:
+            match = re.search(r'(\d+)', memory_str)
+            if match:
+                return int(match.group(1))
+            return 0
+        except (ValueError, AttributeError):
+            return 0
+
 class GPUStats(Static):
     gpu_id = reactive(0)
     gpu_data = reactive({})
@@ -258,7 +309,20 @@ class GPUStats(Static):
             }
             self.running_processes = []
         
+        # Update the process table if it exists
+        self._update_process_table()
         self.refresh()
+    
+    def _update_process_table(self):
+        """Update the GPU process table through the app"""
+        try:
+            # Get the app instance and update the process table
+            app = self.app
+            if hasattr(app, 'gpu_process_table'):
+                app.gpu_process_table.update_processes(self.running_processes)
+        except Exception:
+            # If we can't update the table, that's okay
+            pass
 
     def _extract_memory_mb(self, memory_str):
         """Extract memory value in MB for sorting purposes"""
@@ -380,43 +444,6 @@ class GPUStats(Static):
         # Display any errors
         if "Error" in self.gpu_data:
             lines.append(f"Error: {self.gpu_data['Error']}")
-        
-        lines.append("Running Processes:")
-        if self.running_processes:
-            # Sort processes by memory usage (descending)
-            sorted_processes = sorted(self.running_processes, key=lambda x: self._extract_memory_mb(x.get('Memory', '0 MB')), reverse=True)
-            
-            # Calculate the maximum PID width for alignment
-            max_pid_width = max(len(proc['PID']) for proc in sorted_processes)
-            
-            # Calculate available space for process names
-            widget_width = max(self.size.width - 4, 60)  # Account for borders, minimum 60
-            pid_section = f"  PID: {'X' * max_pid_width} | "  # Template for width calculation
-            mem_section = " | Mem: XXX MB"  # Template for memory section
-            available_name_width = widget_width - len(pid_section) - len(mem_section) - 10  # Extra buffer
-            
-            for proc in sorted_processes:
-                pid = proc['PID']
-                name = proc['Name']
-                memory = proc['Memory']
-                
-                # Format PID with proper padding to align first pipe
-                padded_pid = pid.ljust(max_pid_width)
-                
-                # Truncate process name if needed and pad to align second pipe
-                if len(name) > available_name_width:
-                    truncated_name = name[:available_name_width-3] + "..."
-                else:
-                    truncated_name = name
-                
-                # Pad the process name to align the second pipe symbol
-                padded_name = truncated_name.ljust(available_name_width)
-                
-                # Format: "  PID: 12345 | ProcessName...                    | Mem: 123 MB"
-                line = f"  PID: {padded_pid} | {padded_name} | Mem: {memory}"
-                lines.append(line)
-        else:
-            lines.append("  No GPU processes running")
         
         return "\n".join(lines)
 
@@ -1061,10 +1088,14 @@ class SystemMonitorApp(App):
     def compose(self) -> ComposeResult:
         yield CustomHeader(id="header")
         with Container():
-            # GPU Stats at the top
-            self.gpu_stats = GPUStats(id="gpu-panel")
-            self.gpu_stats.border_title = f"{Symbols.GPU_ICON}  GPU Statistics"
-            yield self.gpu_stats
+            # GPU Stats and Processes side by side at the top
+            with Horizontal():
+                self.gpu_stats = GPUStats(id="gpu-panel")
+                self.gpu_stats.border_title = f"{Symbols.GPU_ICON}  GPU Statistics"
+                yield self.gpu_stats
+                
+                self.gpu_process_table = GPUProcessTable(id="gpu-process-table")
+                yield self.gpu_process_table
             
             # Create network panels side by side below GPU stats
             with Horizontal():
@@ -1089,9 +1120,15 @@ class SystemMonitorApp(App):
 
     def action_next_gpu(self):
         self.gpu_stats.next_gpu()
+        # Update the process table with the new GPU's processes
+        if hasattr(self, 'gpu_process_table'):
+            self.gpu_process_table.update_processes(self.gpu_stats.running_processes)
 
     def action_previous_gpu(self):
         self.gpu_stats.previous_gpu()
+        # Update the process table with the new GPU's processes
+        if hasattr(self, 'gpu_process_table'):
+            self.gpu_process_table.update_processes(self.gpu_stats.running_processes)
 
     def action_next_interface(self):
         self.net_stats.next_interface()

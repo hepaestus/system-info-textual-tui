@@ -25,9 +25,42 @@ Footer {
 #gpu-panel {
     border: solid #00b7c3;
     background: #2a2a2a;
-    margin: 1 1 0 1;  /* top right bottom left - no bottom margin */
+    margin: 1 0 0 1;  /* top right bottom left - no right margin to connect with process table */
     padding: 0;
     min-height: 5;  /* Ensure minimum visible height */
+    width: 1fr;
+}
+
+#gpu-process-table {
+    border: solid #00b7c3;
+    background: #2a2a2a;
+    margin: 1 1 0 0;  /* top right bottom left - no left margin to connect with GPU panel */
+    padding: 0;
+    min-height: 5;
+    width: 1fr;
+}
+
+#gpu-process-table DataTable {
+    background: #2a2a2a;
+    color: white;
+}
+
+#gpu-process-table .datatable--header {
+    background: #00b7c3;
+    color: white;
+}
+
+#gpu-process-table .datatable--odd-row {
+    background: #323130;
+}
+
+#gpu-process-table .datatable--even-row {
+    background: #2a2a2a;
+}
+
+#gpu-process-table .datatable--cursor {
+    background: #0078d4;
+    color: white;
 }
 
 #network-panel {
