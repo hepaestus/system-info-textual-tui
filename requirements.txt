@@ -1,0 +1,26 @@
+# System Info Textual TUI Requirements
+# =================================
+
+# Main TUI framework
+textual>=0.44.0
+
+# Note: The following are built-in Python modules and don't need to be installed:
+# - subprocess (system command execution)
+# - time (timing utilities) 
+# - threading (threading support)
+# - re (regular expressions)
+# - json (JSON parsing)
+# - datetime (date/time handling)
+# - webbrowser (web browser interface)
+
+# System requirements (not Python packages):
+# - nvidia-smi (NVIDIA GPU monitoring tool) 
+# - ip (network interface tool, part of iproute2)
+# - docker (optional, for Docker container monitoring)
+
+# Development dependencies (optional)
+# Uncomment if needed for development:
+# textual[dev]>=0.44.0  # Includes development tools like textual console
+# pytest>=7.0.0         # For unit testing
+# black>=22.0.0          # Code formatting
+# mypy>=1.0.0           # Type checking

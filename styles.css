@@ -1,0 +1,93 @@
+/* GPU Textual TUI Styles - Enhanced with borders and responsive layout */
+
+Screen {
+    background: #1e1e1e;
+    overflow: auto;  /* Handle content overflow gracefully */
+}
+
+Header {
+    background: #0078d4;
+    color: white;
+}
+
+#header {
+    background: #0078d4;
+    color: white;
+    text-align: center;
+    height: 1;
+    width: 100%;
+}
+
+Footer {
+    background: #323130;
+}
+
+#gpu-panel {
+    border: solid #00b7c3;
+    background: #2a2a2a;
+    margin: 1 1 0 1;  /* top right bottom left - no bottom margin */
+    padding: 0;
+    min-height: 5;  /* Ensure minimum visible height */
+}
+
+#network-panel {
+    border: solid #8764b8;
+    background: #2a2a2a;
+    margin: 0 1 0 1;  /* no top/bottom margin to connect panels */
+    padding: 0;
+    width: 1fr;
+    min-width: 30;  /* Minimum width for readability */
+    height: auto;  /* let content determine height */
+}
+
+#network-graph-panel {
+    border: solid #8764b8;
+    background: #2a2a2a;
+    margin: 0 1 0 1;  /* no top/bottom margin to connect panels */
+    padding: 0;
+    width: 1fr;
+    min-width: 40;  /* Minimum width for graph visibility */
+    height: auto;  /* let content determine height */
+}
+
+#docker-panel {
+    border: solid #f39c12;
+    background: #2a2a2a;
+    margin: 0 1 1 1;  /* no top margin to connect with network panels */
+    padding: 0;
+    min-height: 3;  /* Ensure minimum visible height */
+}
+
+#log-panel {
+    border: solid #f7630c;
+    background: #2a2a2a;
+    margin: 1;
+    padding: 1;
+    height: 10;
+}
+
+Static {
+    background: #2a2a2a;
+    color: white;
+}
+
+Button {
+    margin: 1;
+}
+
+Container {
+    background: #1e1e1e;
+    min-height: 20;  /* Ensure container has minimum height */
+}
+
+Horizontal {
+    margin: 0;
+    padding: 0;
+    height: auto;
+    min-height: 10;  /* Ensure horizontal container has minimum height */
+}
+
+/* Ensure widgets can handle small screens */
+Static {
+    overflow: hidden;
+}
