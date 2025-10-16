@@ -79,6 +79,12 @@ pip install -r requirements.txt
 
 ### 4. Install System Dependencies
 
+#### See If You Already Have NVIDIA Support
+```bash 
+nvidia-smi
+```
+If you get antying other than an error. You are probably good to go.
+
 #### NVIDIA GPU Support
 ```bash
 # Install NVIDIA drivers and nvidia-smi
