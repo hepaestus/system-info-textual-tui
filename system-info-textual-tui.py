@@ -1061,11 +1061,34 @@ class CustomHeader(Static):
         self.update(f"{Symbols.GPU_ICON} System Monitor    {Symbols.CALENDAR_ICON} {date_str}    {Symbols.CLOCK_ICON} {time_str}")
 
 class LogPanel(Log):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.log_counter = 0
+        
     def on_mount(self):
-        self.set_interval(2, self.add_log_entry)
+        self.write(f"[{time.strftime('%X')}] System Monitor started\n")
+        self.set_interval(10, self.add_periodic_log_entry)  # Reduced frequency
+        self.scroll_end(animate=False)
 
-    def add_log_entry(self):
-        self.write(f"Log entry at {time.strftime('%X')}")
+    def add_log_entry(self, message):
+        """Add a custom log entry with timestamp"""
+        timestamp = time.strftime('%X')
+        self.write(f"[{timestamp}] {message}\n")
+        self.scroll_end(animate=False)
+
+    def add_periodic_log_entry(self):
+        """Add periodic status updates"""
+        self.log_counter += 1
+        timestamp = time.strftime('%X')
+        
+        # Add different types of log messages periodically
+        if self.log_counter % 3 == 1:
+            self.write(f"[{timestamp}] System monitoring active - Update #{self.log_counter}\n")
+        elif self.log_counter % 3 == 2:
+            self.write(f"[{timestamp}] GPU and network stats refreshed\n")
+        else:
+            self.write(f"[{timestamp}] All systems operational\n")
+            
         self.scroll_end(animate=False)
 
 class SystemMonitorApp(App):
@@ -1119,22 +1142,42 @@ class SystemMonitorApp(App):
         yield Footer()
 
     def action_next_gpu(self):
+        old_gpu = self.gpu_stats.gpu_id
         self.gpu_stats.next_gpu()
+        new_gpu = self.gpu_stats.gpu_id
         # Update the process table with the new GPU's processes
         if hasattr(self, 'gpu_process_table'):
             self.gpu_process_table.update_processes(self.gpu_stats.running_processes)
+        # Log the GPU switch
+        if hasattr(self, 'log_panel'):
+            self.log_panel.add_log_entry(f"Switched from GPU {old_gpu} to GPU {new_gpu}")
 
     def action_previous_gpu(self):
+        old_gpu = self.gpu_stats.gpu_id
         self.gpu_stats.previous_gpu()
+        new_gpu = self.gpu_stats.gpu_id
         # Update the process table with the new GPU's processes
         if hasattr(self, 'gpu_process_table'):
             self.gpu_process_table.update_processes(self.gpu_stats.running_processes)
+        # Log the GPU switch
+        if hasattr(self, 'log_panel'):
+            self.log_panel.add_log_entry(f"Switched from GPU {old_gpu} to GPU {new_gpu}")
 
     def action_next_interface(self):
+        old_interface = self.net_stats.interface
         self.net_stats.next_interface()
+        new_interface = self.net_stats.interface
+        # Log the interface switch
+        if hasattr(self, 'log_panel') and old_interface != new_interface:
+            self.log_panel.add_log_entry(f"Switched network interface from {old_interface} to {new_interface}")
 
     def action_previous_interface(self):
+        old_interface = self.net_stats.interface
         self.net_stats.previous_interface()
+        new_interface = self.net_stats.interface
+        # Log the interface switch
+        if hasattr(self, 'log_panel') and old_interface != new_interface:
+            self.log_panel.add_log_entry(f"Switched network interface from {old_interface} to {new_interface}")
 
     def action_toggle_docker_1(self):
         self.docker_stats.toggle_container("1")
@@ -1145,6 +1188,10 @@ class SystemMonitorApp(App):
     def action_toggle_log_panel(self):
         """Toggle the visibility of the log panel"""
         self.show_log_panel = not self.show_log_panel
+        # Log the panel toggle
+        if hasattr(self, 'log_panel'):
+            status = "shown" if self.show_log_panel else "hidden"
+            self.log_panel.add_log_entry(f"Log panel {status}")
 
     def watch_show_log_panel(self, show_log: bool) -> None:
         """Watch for changes to show_log_panel and update panel visibility"""
