@@ -1,4 +1,4 @@
-# GPU And System Info TUI
+# System Info Textual TUI
 
 A comprehensive real-time system monitoring tool built with Python and Textual. Monitor your GPU, network interfaces, and Docker containers all in one beautiful terminal user interface.
 
@@ -55,8 +55,8 @@ A comprehensive real-time system monitoring tool built with Python and Textual. 
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/yourusername/gpuinfo-textual-tui.git
-cd gpuinfo-textual-tui
+git clone https://github.com/yourusername/system-info-textual-tui.git
+cd system-info-textual-tui
 ```
 
 ### 2. Create Virtual Environment (Recommended)
@@ -99,13 +99,13 @@ sudo usermod -aG docker $USER  # Add user to docker group
 ### Basic Usage
 ```bash
 # Navigate to the project directory
-cd gpuinfo-textual-tui
+cd system-info-textual-tui
 
 # Activate virtual environment
 source .venv/bin/activate
 
 # Run the application
-python3 gpu-textual-tui.py
+python3 system-info-textual-tui.py
 ```
 
 ### Keyboard Controls
@@ -225,11 +225,14 @@ docker ps -a --format json
 
 ### Project Structure
 ```
-gpuinfo-textual-tui/
-├── gpu-textual-tui.py    # Main application file
-├── styles.css            # Textual CSS styling
-├── readme.md             # This file
-└── .venv/                # Virtual environment
+system-info-textual-tui/
+├── system-info-textual-tui.py   # Main application file
+├── styles.css                   # Textual CSS styling
+├── requirements.txt             # Python dependencies
+├── readme.md                    # This file
+├── tmux-command-window.sh       # Tmux helper script
+├── docs/                        # Documentation
+└── .venv/                       # Virtual environment
 ```
 
 ### Contributing
@@ -252,5 +255,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-**Note**: This application requires a Linux environment with appropriate system tools installed. Windows and macOS support may be added in future versions.
+**Note**: This application requires a Linux environment with appropriate system tools installed.
 
