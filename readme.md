@@ -108,6 +108,14 @@ source .venv/bin/activate
 python3 system-info-textual-tui.py
 ```
 
+### Run in the Browser
+
+```bash
+textual serve python3 system-info-textual-tui.py
+```
+Then load up http://localhost:8080 to see the Browser goodness.
+
+
 ### Keyboard Controls
 
 | Key | Action | Description |
