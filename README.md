@@ -37,6 +37,10 @@ A comprehensive real-time system monitoring tool built with Python and Textual. 
 - Intuitive keyboard navigation
 - Professional dark theme with syntax highlighting
 
+### Screen Shot
+
+![Screen Shot](/docs/screenshot.png)
+
 ## Requirements
 
 ### System Requirements
